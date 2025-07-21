@@ -2,7 +2,7 @@ name: Check IT Passport
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 毎時実行（日本時間+9時間注意）
+    - cron: '0,30 * * * *'  # 30分ごとの実行（UTC基準）
   workflow_dispatch:
 
 jobs:
