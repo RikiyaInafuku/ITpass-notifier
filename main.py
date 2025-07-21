@@ -32,9 +32,11 @@ def send_email(subject, body):
 
 # ========== 日付変換関数 ==========
 def convert_date(japanese_date):
-    date_part = japanese_date.split('(')[0]
-    date_obj = datetime.datetime.strptime(date_part.strip(), "%Y年 %m月 %d日")
+    date_part = japanese_date.split('(')[0]  # 「(日)」を削除
+    date_part = date_part.replace(" ", "")   # 全角スペース削除
+    date_obj = datetime.datetime.strptime(date_part.strip(), "%Y年%m月%d日")
     return date_obj.strftime("%Y/%m/%d")
+
 
 # ========== PDFチェック ==========
 url = "https://www3.jitec.ipa.go.jp/JitesCbt/html/examhall/pdf/沖縄県_試験開催状況一覧.pdf"
