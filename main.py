@@ -4,8 +4,17 @@ import io
 import os
 import smtplib
 from email.mime.text import MIMEText
+import datetime
 
-# メール送信関数
+# ========== 設定 ==========
+TARGET_HALLS = [
+    "那覇港町試験会場",
+    "OAC沖縄試験会場"
+]
+
+my_date = "2025/10/12"
+
+# ========== メール送信関数 ==========
 def send_email(subject, body):
     from_email = os.environ['EMAIL_USER']
     to_email = os.environ['EMAIL_TO']
@@ -21,27 +30,39 @@ def send_email(subject, body):
     server.send_message(msg)
     server.quit()
 
-# PDFダウンロード
+# ========== 日付変換関数 ==========
+def convert_date(japanese_date):
+    date_part = japanese_date.split('(')[0]
+    date_obj = datetime.datetime.strptime(date_part.strip(), "%Y年 %m月 %d日")
+    return date_obj.strftime("%Y/%m/%d")
+
+# ========== PDFチェック ==========
 url = "https://www3.jitec.ipa.go.jp/JitesCbt/html/examhall/pdf/沖縄県_試験開催状況一覧.pdf"
 pdf_data = requests.get(url).content
 
-# 予約日（ここを自分の日程に変える）
-my_date = "2025/09/01"
-
-# PDFチェック
 found = False
 with pdfplumber.open(io.BytesIO(pdf_data)) as pdf:
+    current_hall = None  # 直近の会場名を保存
+
     for page in pdf.pages:
         table = page.extract_table()
         for row in table:
-            if len(row) < 3:
+            if len(row) < 6:
                 continue
-            date = row[0].strip()
-            seat = row[2].strip()
+
+            if row[0].strip() != "":
+                current_hall = row[0].strip()
+
+            if current_hall not in TARGET_HALLS:
+                continue
+
+            date = convert_date(row[2].strip())  # 日付（3列目）
+            seat = row[5].strip()                # 空席数（6列目）
+
             if seat.isdigit() and int(seat) > 0:
                 if date < my_date:
                     found = True
-                    msg = f"【ITパスポート】\n{date} に空席 {seat} 席あります！"
+                    msg = f"【ITパスポート 空席通知】\n{current_hall}\n{date} に空席 {seat} 席あります！"
                     send_email("ITパスポート空席通知", msg)
 
 if not found:
