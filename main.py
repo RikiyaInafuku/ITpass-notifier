@@ -32,11 +32,10 @@ def send_email(subject, body):
 
 # ========== 日付変換関数 ==========
 def convert_date(japanese_date):
-    date_part = japanese_date.split('(')[0]  # 「(日)」を削除
-    date_part = date_part.replace(" ", "")   # 全角スペース削除
+    date_part = japanese_date.split('(')[0]
+    date_part = date_part.replace(" ", "")
     date_obj = datetime.datetime.strptime(date_part.strip(), "%Y年%m月%d日")
     return date_obj.strftime("%Y/%m/%d")
-
 
 # ========== PDFチェック ==========
 url = "https://www3.jitec.ipa.go.jp/JitesCbt/html/examhall/pdf/沖縄県_試験開催状況一覧.pdf"
@@ -49,7 +48,7 @@ with pdfplumber.open(io.BytesIO(pdf_data)) as pdf:
     for page in pdf.pages:
         table = page.extract_table()
         for row in table:
-            if len(row) < 6:
+            if len(row) < 7:
                 continue
 
             cell_value = row[0]
@@ -59,8 +58,12 @@ with pdfplumber.open(io.BytesIO(pdf_data)) as pdf:
             if current_hall not in TARGET_HALLS:
                 continue
 
-            date = convert_date(row[3].strip())  # 日付（3列目）
-            seat = row[6].strip()                # 空席数（6列目）
+            date_cell = row[3]
+            if date_cell is None or date_cell.strip() == "":
+                continue
+
+            date = convert_date(date_cell.strip())
+            seat = row[6].strip()
 
             if seat.isdigit() and int(seat) > 0:
                 if date < my_date:
