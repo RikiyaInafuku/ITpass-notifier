@@ -50,8 +50,9 @@ with pdfplumber.open(io.BytesIO(pdf_data)) as pdf:
             if len(row) < 6:
                 continue
 
-            if row[0].strip() != "":
-                current_hall = row[0].strip()
+            cell_value = row[0]
+            if cell_value is not None and cell_value.strip() != "":
+                current_hall = cell_value.strip()
 
             if current_hall not in TARGET_HALLS:
                 continue
