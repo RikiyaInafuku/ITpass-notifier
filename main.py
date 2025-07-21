@@ -57,8 +57,8 @@ with pdfplumber.open(io.BytesIO(pdf_data)) as pdf:
             if current_hall not in TARGET_HALLS:
                 continue
 
-            date = convert_date(row[2].strip())  # 日付（3列目）
-            seat = row[5].strip()                # 空席数（6列目）
+            date = convert_date(row[3].strip())  # 日付（3列目）
+            seat = row[6].strip()                # 空席数（6列目）
 
             if seat.isdigit() and int(seat) > 0:
                 if date < my_date:
