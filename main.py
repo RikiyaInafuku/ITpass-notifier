@@ -12,7 +12,10 @@ TARGET_HALLS = [
     "OAC沖縄試験会場"
 ]
 
-my_date = "2025/10/12"
+# ========== 通知する日付範囲 ==========
+start_date = "2025/08/15"
+end_date = "2025/10/11"
+
 
 # ========== メール送信関数 ==========
 def send_email(subject, body):
@@ -66,7 +69,7 @@ with pdfplumber.open(io.BytesIO(pdf_data)) as pdf:
             seat = row[6].strip()
 
             if seat.isdigit() and int(seat) > 0:
-                if date < my_date:
+                if start_date <= date <= end_date:
                     found = True
                     msg = f"【ITパスポート 空席通知】\n{current_hall}\n{date} に空席 {seat} 席あります！"
                     send_email("ITパスポート空席通知", msg)
