@@ -2,12 +2,17 @@ name: Check IT Passport
 
 on:
   schedule:
-    - cron: '0,30 * * * *'  # 30分ごとの実行（UTC基準）
+    - cron: '0 * * * *'  # 1時間ごとの実行
   workflow_dispatch:
 
 jobs:
   notify:
     runs-on: ubuntu-latest
+
+    env:
+      EMAIL_USER: ${{ secrets.EMAIL_USER }}
+      EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+      EMAIL_TO: ${{ secrets.EMAIL_TO }}
 
     steps:
     - uses: actions/checkout@v3
